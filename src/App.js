@@ -4,19 +4,23 @@ import io from "socket.io-client";
 import Nav from "./components/Nav";
 import {
   eNotificationContext,
+  GameContext,
+  PlayerContext,
   MessageContext,
-  GameAndPlayerContext,
 } from "./components/context/GameContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import GameArena from "./components/pages/GameArena";
+import Peer from "peerjs";
 import { removeDuplicates } from "./components/utils/utils";
 
 const App = () => {
   const [chatRegistered, setChatRegistered] = useState(false);
+  const [peer, setPeer] = useState(null);
 
   // | CONTEXT VARIABLES
+  const [game, setGame] = useContext(GameContext);
   const [messages, setMessages] = useContext(MessageContext);
-  const [{ game, player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
+  const [player, setPlayer] = useContext(PlayerContext);
   const [eNotification, eNotificationHandler] = useContext(
     eNotificationContext
   );
@@ -31,9 +35,29 @@ const App = () => {
     chatSocket.emit("join chat", { gameId, chatRegistered, handle });
   };
 
+  // PEER
+  !peer &&
+    player &&
+    game.players.length > 0 &&
+    setPeer(
+      new Peer(undefined, {
+        host: "/",
+        port: "9000",
+      })
+    );
+
+  peer &&
+    peer.on("open", (id) => {
+      console.log(id);
+      const credentials = { gameId: game.id, playerId: player.id, vcid: id };
+      socket.emit("vcid", credentials);
+    });
+
   // | SOCKET EVENTS
   socket.on("game error", () => window.location.reload());
   socket.on("start error", (msg) => {
+    console.log("IS IT YOU?");
+    // console.log("FIXT");
     eNotificationHandler({ msg });
   });
   socket.on("checked notification", (playerObj) => {
@@ -43,14 +67,16 @@ const App = () => {
     eNotificationHandler({ msg, colour: "#11ff11" });
   });
   socket.on("game update", (gameObject) => {
-    const playerObj = gameObject.players.filter(
-      (playerObject) => playerObject.id === player.id
-    )[0];
-    setGameAndPlayer({ game: gameObject, player: playerObj });
+    setGame(gameObject);
+    gameObject.players.forEach((playerObject) => {
+      if (playerObject.id === player.id) {
+        setPlayer(() => playerObject);
+      }
+    });
   });
 
   const handleErrors = (code) => {
-    console.log("Caution. Rouge Robots", code);
+    // console.log("Caution. Rouge Robots", code);
   };
 
   socket.on("connect_error", () => handleErrors("c1"));
@@ -87,8 +113,7 @@ const App = () => {
                 handleChatRegister={handleChatRegister}
                 chatRegistered={chatRegistered}
                 setChatRegistered={setChatRegistered}
-                // peer={peer}
-                // setPeer={setPeer}
+                peer={peer}
               />
             )}
           />
