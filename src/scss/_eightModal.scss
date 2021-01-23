@@ -1,0 +1,90 @@
+.eight-container {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+
+  h1 {
+    z-index: 3;
+    color: #fff;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+    background-color: rgba(90, 126, 143, 0.952);
+  }
+  .symbol-selection-container {
+    justify-self: center;
+    align-self: center;
+    display: grid;
+    width: 80%;
+    height: 200px;
+    max-width: 300px;
+    grid-template-columns: 1fr 1fr;
+    z-index: 3;
+    grid-gap: 5px;
+
+    div {
+      cursor: pointer;
+      background-color: #fff;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 60px;
+
+      .card-symbol-container {
+        width: 45px;
+        height: 75px;
+        margin: 10px;
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+  .eight-modal-cards-list {
+    position: relative;
+    z-index: 4;
+    width: 90%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .eight-modal-card {
+      border-radius: 10px;
+      margin: 5px;
+      padding: 0 10px;
+      // height: 30px;
+      background-color: rgba(255, 255, 255, 0.507);
+      // opacity: 0;
+
+      h2 {
+        margin: 0;
+      }
+      .card-symbol-container {
+        width: 15px;
+        height: 25px;
+        margin: 5px;
+
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+}
