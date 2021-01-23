@@ -35,12 +35,12 @@ const JoinGameForm = ({ socket, gameCode }) => {
   //   setRedirect(true);
   // });
 
-  socket.on("game update", (gameObject) => {
-    const playerObj = gameObject.players.filter(
-      (playerObject) => playerObject.id === player.id
-    )[0];
-    setGameAndPlayer({ game: gameObject, player: playerObj });
-  });
+  // socket.on("game update", (gameObject) => {
+  //   const playerObj = gameObject.players.filter(
+  //     (playerObject) => playerObject.id === player.id
+  //   )[0];
+  //   setGameAndPlayer({ game: gameObject, player: playerObj });
+  // });
 
   const joinGameHandler = ({ handle, justWatch }) => {
     setGameCodeError(() => false);

@@ -4,8 +4,7 @@ import io from "socket.io-client";
 import Nav from "./components/Nav";
 import {
   eNotificationContext,
-  GameContext,
-  PlayerContext,
+  GameAndPlayerContext,
   MessageContext,
 } from "./components/context/GameContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
@@ -18,9 +17,8 @@ const App = () => {
   const [peer, setPeer] = useState(null);
 
   // | CONTEXT VARIABLES
-  const [game, setGame] = useContext(GameContext);
+  const [{ player, game }, setGameAndPlayer] = useContext(GameAndPlayerContext);
   const [messages, setMessages] = useContext(MessageContext);
-  const [player, setPlayer] = useContext(PlayerContext);
   const [eNotification, eNotificationHandler] = useContext(
     eNotificationContext
   );
@@ -67,21 +65,19 @@ const App = () => {
     eNotificationHandler({ msg, colour: "#11ff11" });
   });
   socket.on("game update", (gameObject) => {
-    setGame(gameObject);
-    gameObject.players.forEach((playerObject) => {
-      if (playerObject.id === player.id) {
-        setPlayer(() => playerObject);
-      }
-    });
+    const playerObj = gameObject.players.filter(
+      (playerObject) => playerObject.id === player.id
+    )[0];
+    setGameAndPlayer({ game: gameObject, player: playerObj });
   });
 
   const handleErrors = (code) => {
     // console.log("Caution. Rouge Robots", code);
   };
 
-  socket.on("connect_error", () => handleErrors("c1"));
-  socket.on("connect_failed", () => handleErrors("c2"));
-  socket.on("disconnect", () => handleErrors("c3"));
+  // socket.on("connect_error", () => handleErrors("c1"));
+  // socket.on("connect_failed", () => handleErrors("c2"));
+  // socket.on("disconnect", () => handleErrors("c3"));
 
   // | Chat Socket Events
   chatSocket.on("new message", (msg) => {

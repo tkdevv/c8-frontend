@@ -1,9 +1,8 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
-import { GameContext, PlayerContext } from "./context/GameContext";
+import { GameAndPlayerContext } from "./context/GameContext";
 
 const VoiceChat = ({ peer, socket }) => {
-  const [game] = useContext(GameContext);
-  const [player] = useContext(PlayerContext);
+  const [{ player, game }] = useContext(GameAndPlayerContext);
   const [callObject, setCallObject] = useState(null);
   const voiceChatroom = game.players.filter((player) => player.voiceChatAvail);
   const [chatLoading, setChatLoading] = useState(true);

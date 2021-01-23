@@ -1,16 +1,11 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import {
-  GameContext,
-  PlayerContext,
-  MessageContext,
-} from "./context/GameContext";
+import { GameAndPlayerContext, MessageContext } from "./context/GameContext";
 
 const ChatAndViews = ({ chatSocket }) => {
   const mobileChatWidth = 1050;
   const chatOpenInit = window.innerWidth >= mobileChatWidth ? true : false;
   const messageTyped = useRef();
-  const [game] = useContext(GameContext);
-  const [player] = useContext(PlayerContext);
+  const [{ player, game }] = useContext(GameAndPlayerContext);
   const [messages, setMessages] = useContext(MessageContext);
   const [chatOpen, setChatOpen] = useState(chatOpenInit);
   const [newMessages, setNewMessages] = useState(messages.length);
