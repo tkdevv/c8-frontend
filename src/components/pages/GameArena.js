@@ -34,14 +34,14 @@ const GameArena = ({
     <div className="game-arena-container">
       {!game.id && <Redirect to="" />}
       <ChatAndViews chatSocket={chatSocket} />
-      {/* <VoiceChat socket={socket} /> */}
+      <VoiceChat socket={socket} />
       <div className="game-area">
         {game.state === "waiting" || game.state === "waitingNewRound" ? (
           <GameArenaWaiting socket={socket} />
         ) : (
           <GameArenaActive socket={socket} chatSocket={chatSocket} />
         )}
-        {/* {eNotification && eNotification !== noNotification && <ENotification />} */}
+        {eNotification && eNotification !== noNotification && <ENotification />}
       </div>
     </div>
   );

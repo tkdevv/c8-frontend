@@ -4,21 +4,19 @@ import io from "socket.io-client";
 import Nav from "./components/Nav";
 import {
   eNotificationContext,
-  GameAndPlayerContext,
   MessageContext,
+  GameAndPlayerContext,
 } from "./components/context/GameContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import GameArena from "./components/pages/GameArena";
-import Peer from "peerjs";
 import { removeDuplicates } from "./components/utils/utils";
 
 const App = () => {
   const [chatRegistered, setChatRegistered] = useState(false);
-  const [peer, setPeer] = useState(null);
 
   // | CONTEXT VARIABLES
-  const [{ player, game }, setGameAndPlayer] = useContext(GameAndPlayerContext);
   const [messages, setMessages] = useContext(MessageContext);
+  const [{ game, player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
   const [eNotification, eNotificationHandler] = useContext(
     eNotificationContext
   );
@@ -33,29 +31,9 @@ const App = () => {
     chatSocket.emit("join chat", { gameId, chatRegistered, handle });
   };
 
-  // PEER
-  !peer &&
-    player &&
-    game.players.length > 0 &&
-    setPeer(
-      new Peer(undefined, {
-        host: "/",
-        port: "9000",
-      })
-    );
-
-  peer &&
-    peer.on("open", (id) => {
-      console.log(id);
-      const credentials = { gameId: game.id, playerId: player.id, vcid: id };
-      socket.emit("vcid", credentials);
-    });
-
   // | SOCKET EVENTS
   socket.on("game error", () => window.location.reload());
   socket.on("start error", (msg) => {
-    console.log("IS IT YOU?");
-    // console.log("FIXT");
     eNotificationHandler({ msg });
   });
   socket.on("checked notification", (playerObj) => {
@@ -72,12 +50,12 @@ const App = () => {
   });
 
   const handleErrors = (code) => {
-    // console.log("Caution. Rouge Robots", code);
+    console.log("Caution. Rouge Robots", code);
   };
 
-  // socket.on("connect_error", () => handleErrors("c1"));
-  // socket.on("connect_failed", () => handleErrors("c2"));
-  // socket.on("disconnect", () => handleErrors("c3"));
+  socket.on("connect_error", () => handleErrors("c1"));
+  socket.on("connect_failed", () => handleErrors("c2"));
+  socket.on("disconnect", () => handleErrors("c3"));
 
   // | Chat Socket Events
   chatSocket.on("new message", (msg) => {
@@ -109,7 +87,8 @@ const App = () => {
                 handleChatRegister={handleChatRegister}
                 chatRegistered={chatRegistered}
                 setChatRegistered={setChatRegistered}
-                peer={peer}
+                // peer={peer}
+                // setPeer={setPeer}
               />
             )}
           />

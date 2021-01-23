@@ -65,18 +65,20 @@ const GlobalState = ({ children }) => {
     }
   };
 
-  console.log("FUUUCK");
-
   return (
     <MessageContext.Provider value={[messages, setMessages]}>
       <eNotificationContext.Provider
         value={[eNotification, eNotificationHandler]}
       >
-        <GameAndPlayerContext.Provider
-          value={[gameAndPlayer, setGameAndPlayer]}
-        >
-          {children}
-        </GameAndPlayerContext.Provider>
+        <GameContext.Provider value={[gameAndPlayer.game]}>
+          <PlayerContext.Provider value={[gameAndPlayer.player]}>
+            <GameAndPlayerContext.Provider
+              value={[gameAndPlayer, setGameAndPlayer]}
+            >
+              {children}
+            </GameAndPlayerContext.Provider>
+          </PlayerContext.Provider>
+        </GameContext.Provider>
       </eNotificationContext.Provider>
     </MessageContext.Provider>
   );

@@ -14,9 +14,7 @@ const ChatAndViews = ({ chatSocket }) => {
   //   console.log("IM UPDATING MESSAGES");
   //   setMessages((prevMsgs) => [msg, ...prevMsgs]);
   // });
-  // xxx - FIX REMOVE EVENT LISTENER
-  // xxx - FIX REMOVE EVENT LISTENER
-  // xxx - FIX REMOVE EVENT LISTENER
+
   const toggleButtonText = chatOpen ? "Close Chat" : "Open Chat";
   const chatOpenClass = !chatOpen ? " toggle-closed" : "";
   const handleStyle = (colour) => {
