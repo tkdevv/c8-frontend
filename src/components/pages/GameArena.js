@@ -3,9 +3,7 @@ import ChatAndViews from "../ChatAndViews";
 import GameArenaWaiting from "../GameArenaWaiting";
 import GameArenaActive from "../GameArenaActive";
 import {
-  GameContext,
-  PlayerContext,
-  MessageContext,
+  GameAndPlayerContext,
   eNotificationContext,
 } from "../context/GameContext";
 import { Redirect } from "react-router-dom";
@@ -16,13 +14,13 @@ const GameArena = ({
   socket,
   chatSocket,
   handleChatRegister,
-  peer,
+  // peer,
+  // setPeer,
   chatRegistered,
 }) => {
   // const [chatRegistered, setChatRegistered] = useState(false);
 
-  const [game] = useContext(GameContext);
-  const [player] = useContext(PlayerContext);
+  const [{ game, player }] = useContext(GameAndPlayerContext);
   const noNotification = "No Noti";
   const [eNotification] = useContext(eNotificationContext);
 
@@ -36,7 +34,7 @@ const GameArena = ({
     <div className="game-arena-container">
       {!game.id && <Redirect to="" />}
       <ChatAndViews chatSocket={chatSocket} />
-      <VoiceChat peer={peer} socket={socket} />
+      <VoiceChat socket={socket} />
       <div className="game-area">
         {game.state === "waiting" || game.state === "waitingNewRound" ? (
           <GameArenaWaiting socket={socket} />

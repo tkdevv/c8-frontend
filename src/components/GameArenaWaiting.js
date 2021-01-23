@@ -1,14 +1,9 @@
 import React, { useContext, useEffect } from "react";
-import {
-  GameContext,
-  PlayerContext,
-  eNotificationContext,
-} from "./context/GameContext";
+import { GameAndPlayerContext } from "./context/GameContext";
 import { numOfCardsOptionStyle } from "./utils/utils";
 
 const GameArenaWaiting = ({ socket }) => {
-  const [game] = useContext(GameContext);
-  const [player] = useContext(PlayerContext);
+  const [{ game, player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
 
   const allPlayers = game.players.length;
   const playersPlaying = game.players.filter(

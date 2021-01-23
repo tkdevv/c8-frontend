@@ -40,11 +40,14 @@ export const GameContext = createContext(null);
 export const PlayerContext = createContext(null);
 export const MessageContext = createContext(null);
 export const eNotificationContext = createContext(null);
+export const GameAndPlayerContext = createContext(null);
 // export const ChatRegisterContext = createContext(false);
 
 const GlobalState = ({ children }) => {
-  const [game, setGame] = useState(initGame);
-  const [player, setPlayer] = useState(initPlayer);
+  const [gameAndPlayer, setGameAndPlayer] = useState({
+    game: initGame,
+    player: initPlayer,
+  });
   const [messages, setMessages] = useState([]);
   const [timeoutId, setTimeoutId] = useState(null);
   const [eNotification, setENotification] = useState("No Noti");
@@ -67,9 +70,13 @@ const GlobalState = ({ children }) => {
       <eNotificationContext.Provider
         value={[eNotification, eNotificationHandler]}
       >
-        <GameContext.Provider value={[game, setGame]}>
-          <PlayerContext.Provider value={[player, setPlayer]}>
-            {children}
+        <GameContext.Provider value={[gameAndPlayer.game]}>
+          <PlayerContext.Provider value={[gameAndPlayer.player]}>
+            <GameAndPlayerContext.Provider
+              value={[gameAndPlayer, setGameAndPlayer]}
+            >
+              {children}
+            </GameAndPlayerContext.Provider>
           </PlayerContext.Provider>
         </GameContext.Provider>
       </eNotificationContext.Provider>

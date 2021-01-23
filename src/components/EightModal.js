@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 // import { cardStyle } from "./utils/utils";
-import { GameContext, PlayerContext } from "./context/GameContext";
-import { Player } from "./objects/objects";
+import { GameAndPlayerContext } from "./context/GameContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   cardSymbol,
@@ -12,8 +11,7 @@ import {
 import CardSymbol from "./CardSymbol";
 
 const EightModal = ({ socket, card, setEightEvent }) => {
-  const [game, setGame] = useContext(GameContext);
-  const [player, setPlayer] = useContext(PlayerContext);
+  const [{ game, player }] = useContext(GameAndPlayerContext);
 
   const launch8 = (symbol) => {
     socket.emit("card played", {

@@ -1,13 +1,31 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
-import { GameContext, PlayerContext } from "./context/GameContext";
+import { GameAndPlayerContext } from "./context/GameContext";
+import Peer from "peerjs";
 
-const VoiceChat = ({ peer, socket }) => {
-  const [game] = useContext(GameContext);
-  const [player] = useContext(PlayerContext);
+const VoiceChat = ({ socket }) => {
+  const [{ game, player }] = useContext(GameAndPlayerContext);
   const [callObject, setCallObject] = useState(null);
   const voiceChatroom = game.players.filter((player) => player.voiceChatAvail);
   const [chatLoading, setChatLoading] = useState(true);
   const [initiated, setInitiated] = useState(false);
+  const [peer, setPeer] = useState(null);
+
+  // PEER
+  !peer &&
+    player &&
+    game.players.length > 0 &&
+    setPeer(
+      new Peer(undefined, {
+        host: "/",
+        port: "9000",
+      })
+    );
+
+  peer &&
+    peer.on("open", (id) => {
+      const credentials = { gameId: game.id, playerId: player.id, vcid: id };
+      socket.emit("vcid", credentials);
+    });
 
   const referenceNames = [
     "one",
@@ -41,14 +59,12 @@ const VoiceChat = ({ peer, socket }) => {
 
   const credentials = { gameId: game.id, playerId: player.id };
 
-  // console.log(player.voiceChatId);
+  // console.log(peer);
 
   const leaveVoiceChat = () => {
     if (streamRef.current) {
       let stream = streamRef.current;
-      // console.log(stream.active);
       stream.getTracks().forEach((track) => track.stop());
-      // console.log(stream.active);
       socket.emit("leave voice", credentials);
       if (callObject) {
         callObject.close();
@@ -58,12 +74,19 @@ const VoiceChat = ({ peer, socket }) => {
     }
   };
 
-  useEffect(() => console.log(chatLoading), [chatLoading]);
-
   if (chatLoading && !initiated) {
     setInitiated(true);
     setTimeout(() => setChatLoading(false), 6500);
   }
+
+  // peer &&
+  //   peer.on("error", () => {
+  //     leaveVoiceChat();
+  //     console.log("Peer connection error.");
+  // console.log(peer.destroyed);
+  // console.log(peer.disconnected);
+  // setPeer(null);
+  // });
 
   const joinVoiceChat = () => {
     const constraints = {
@@ -76,14 +99,20 @@ const VoiceChat = ({ peer, socket }) => {
       .then((streamObj) => {
         streamRef.current = streamObj;
         sendPlayersMyAudio(streamObj);
-        // console.log(streamObj);
+
         socket.emit("join voice", credentials);
 
         peer.on("call", (call) => {
           // console.log("Receiving Call");
           setCallObject(call);
           call.answer(streamObj);
+
+          call.on("close", () => {
+            console.log("call closed");
+          });
+
           call.on("stream", (userStream) => {
+            // console.log("calling stream: ", userStream);
             addStreamToDOM(userStream);
           });
         });
@@ -96,13 +125,15 @@ const VoiceChat = ({ peer, socket }) => {
   // console.log("Chatty: ", player.voiceChatAvail);
 
   const sendPlayersMyAudio = (streamObj) => {
+    console.log("HAPPENINGS");
     voiceChatroom.forEach((playerObj) => {
       // console.log(playerObj.voiceChatId, player.id);
       if (playerObj.id !== player.id) {
         console.log("xxx: ", playerObj.handle);
         const call = peer.call(playerObj.voiceChatId, streamObj);
-        setCallObject(call);
+        if (!callObject) setCallObject(call);
         call.on("stream", (theirStream) => {
+          console.log("their stream");
           addStreamToDOM(theirStream);
         });
 
@@ -149,12 +180,14 @@ const VoiceChat = ({ peer, socket }) => {
       style={chatLoading ? { display: "none" } : {}}
       className="voice-chat-container"
     >
+      {/* {peer && ( */}
       <button
         className={`vc-btn${playerInVoiceChat ? " vc-btn-on" : ""}`}
         onClick={() => (playerInVoiceChat ? leaveVoiceChat() : joinVoiceChat())}
       >
         {playerInVoiceChat ? "VOICE OFF" : "VOICE ON"}
       </button>
+      {/* )} */}
 
       <div className="vc-indicators-container">
         {voiceChatroom.map((player) => (

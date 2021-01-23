@@ -3,9 +3,7 @@ import { eNotificationContext } from "./context/GameContext";
 import { AnimatePresence, motion } from "framer-motion";
 
 const ENotification = () => {
-  const [eNotification, eNotificationHandler] = useContext(
-    eNotificationContext
-  );
+  const [eNotification] = useContext(eNotificationContext);
   const backgroundColor = eNotification.colour
     ? eNotification.colour
     : "#11ff11";

@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
 import {
-  GameContext,
-  PlayerContext,
   eNotificationContext,
+  GameAndPlayerContext,
 } from "./context/GameContext";
 import { motion, AnimatePresence } from "framer-motion";
 import EightModal from "./EightModal";
@@ -17,8 +16,7 @@ import { Redirect } from "react-router-dom";
 import CardSymbol from "./CardSymbol";
 
 const GameArenaActive = ({ socket }) => {
-  const [game] = useContext(GameContext);
-  const [player] = useContext(PlayerContext);
+  const [{ game, player }] = useContext(GameAndPlayerContext);
   const [eNotification, eNotificationHandler] = useContext(
     eNotificationContext
   );

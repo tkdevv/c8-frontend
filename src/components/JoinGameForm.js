@@ -1,13 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
-import { PlayerContext, GameContext } from "./context/GameContext";
+import { GameAndPlayerContext } from "./context/GameContext";
 import { Redirect } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { titleCase } from "./utils/utils";
 
 const JoinGameForm = ({ socket, gameCode }) => {
   const { register, handleSubmit, errors } = useForm();
-  const [player, setPlayer] = useContext(PlayerContext);
-  const [game, setGame] = useContext(GameContext);
+  const [{ player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
   const [gameCodeError, setGameCodeError] = useState(false);
 
   const [redirect, setRedirect] = useState(false);
@@ -37,20 +36,18 @@ const JoinGameForm = ({ socket, gameCode }) => {
   // });
 
   socket.on("game update", (gameObject) => {
-    setGame(gameObject);
-    gameObject.players.forEach((playerObject) => {
-      if (playerObject.id === player.id) {
-        setPlayer(() => playerObject);
-      }
-    });
+    const playerObj = gameObject.players.filter(
+      (playerObject) => playerObject.id === player.id
+    )[0];
+    setGameAndPlayer({ game: gameObject, player: playerObj });
   });
 
   const joinGameHandler = ({ handle, justWatch }) => {
     setGameCodeError(() => false);
-    setPlayer((prevPlayer) => {
-      prevPlayer.handle = titleCase(handle);
-      prevPlayer.status = justWatch ? "watching" : "waiting";
-      return prevPlayer;
+    setGameAndPlayer((prev) => {
+      prev.player.handle = titleCase(handle);
+      prev.player.status = justWatch ? "watching" : "waiting";
+      return prev;
     });
 
     socket.emit("join game", {
