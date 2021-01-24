@@ -53,15 +53,17 @@ const GlobalState = ({ children }) => {
   const [eNotification, setENotification] = useState("No Noti");
 
   const eNotificationHandler = (noti) => {
-    console.log("IM BEING CALLED", noti);
-    if (timeoutId) {
-      console.log("THERE'S A TIMEOUT ID");
-      clearTimeout(timeoutId);
-      setTimeoutId(null);
-    }
-    if (noti & (noti.msg !== eNotification.msg)) {
+    console.log(timeoutId);
+    clearTimeout(timeoutId);
+    setTimeoutId(null);
+    console.log(timeoutId);
+
+    if (noti && noti.msg !== eNotification.msg) {
+      console.log("setting msg", noti);
       setENotification(noti);
-      setTimeoutId(setTimeout(() => setENotification("No Noti"), 3000));
+      setTimeoutId(
+        setTimeout(() => setENotification({ msg: "No Noti" }), 3000)
+      );
     }
   };
 

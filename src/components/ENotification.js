@@ -19,7 +19,7 @@ const ENotification = () => {
         className="e-modal-container"
       >
         <div className="e-modal">
-          <h1>{eNotification ? eNotification.msg : ""}</h1>
+          <h1>{eNotification ? eNotification.msg : "Summer"}</h1>
           {/* <button>X</button> */}
           {/* <button onClick={eNotificationHandler("No Noti")}>X</button> */}
         </div>

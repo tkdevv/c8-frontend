@@ -16,7 +16,7 @@ const App = () => {
 
   // | CONTEXT VARIABLES
   const [messages, setMessages] = useContext(MessageContext);
-  const [{ game, player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
+  const [{ player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
   const [eNotification, eNotificationHandler] = useContext(
     eNotificationContext
   );
@@ -27,7 +27,6 @@ const App = () => {
   const chatSocket = io("http://localhost:8001/chat");
 
   const handleChatRegister = (gameId, handle) => {
-    // console.log("EMITING JOIN EVENT");
     chatSocket.emit("join chat", { gameId, chatRegistered, handle });
   };
 
@@ -36,6 +35,9 @@ const App = () => {
   socket.on("start error", (msg) => {
     eNotificationHandler({ msg });
   });
+  // socket.on("connect", () => console.log("connection back"));
+  // chatSocket.on("connect ", () => console.log("chat connection back"));
+
   socket.on("checked notification", (playerObj) => {
     const msg = `${
       playerObj.id === player.id ? "You" : playerObj.handle
@@ -49,13 +51,16 @@ const App = () => {
     setGameAndPlayer({ game: gameObject, player: playerObj });
   });
 
-  const handleErrors = (code) => {
-    console.log("Caution. Rouge Robots", code);
-  };
+  // const handleErrors = (code) => {
+  //   console.log("Caution. Rouge Robots", code);
+  // };
 
-  socket.on("connect_error", () => handleErrors("c1"));
-  socket.on("connect_failed", () => handleErrors("c2"));
-  socket.on("disconnect", () => handleErrors("c3"));
+  // socket.on("connect_error", () => handleErrors("c1"));
+  // socket.on("connect_failed", () => handleErrors("c2"));
+  // socket.on("disconnect", () => handleErrors("c3"));
+  // chatSocket.on("connect_error", () => handleErrors("chat c1"));
+  // chatSocket.on("connect_failed", () => handleErrors("chat c2"));
+  // chatSocket.on("disconnect", () => handleErrors("chat c3"));
 
   // | Chat Socket Events
   chatSocket.on("new message", (msg) => {
@@ -87,8 +92,6 @@ const App = () => {
                 handleChatRegister={handleChatRegister}
                 chatRegistered={chatRegistered}
                 setChatRegistered={setChatRegistered}
-                // peer={peer}
-                // setPeer={setPeer}
               />
             )}
           />

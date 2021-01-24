@@ -218,10 +218,12 @@
           // border: 0.13rem solid $pink-trim-color;
           border: none;
           border-radius: 15px;
-          padding-left: 10px;
+          // padding-left: 10px;
           color: rgb(235, 235, 235);
           // position: absolute;
           bottom: 0;
+          display: flex;
+          align-items: center;
         }
 
         .chat-submit {
@@ -369,6 +371,13 @@
       border: 1px solid #ff7c11;
       color: #ff7c11;
       background-color: #5c2a1380;
+    }
+    .vc-btn-offline {
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid #b19a9ac5;
+      color: #b19a9ac5;
+      background-color: #5c13132a;
     }
   }
 

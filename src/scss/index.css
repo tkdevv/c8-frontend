@@ -258,9 +258,14 @@
   height: 30px;
   border: none;
   border-radius: 15px;
-  padding-left: 10px;
   color: #ebebeb;
   bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .game-arena-container .chat-container .chat-form-container .chat-form .chat-submit {
@@ -430,6 +435,14 @@
   border: 1px solid #ff7c11;
   color: #ff7c11;
   background-color: #5c2a1380;
+}
+
+.game-arena-container .voice-chat-container .vc-btn-offline {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #b19a9ac5;
+  color: #b19a9ac5;
+  background-color: #5c13132a;
 }
 
 .game-arena-container .vc-indicators-container {

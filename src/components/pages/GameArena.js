@@ -30,6 +30,8 @@ const GameArena = ({
       handleChatRegister(game.id, player.handle);
   }, [player]);
 
+  console.log(eNotification);
+
   return (
     <div className="game-arena-container">
       {!game.id && <Redirect to="" />}
@@ -41,7 +43,9 @@ const GameArena = ({
         ) : (
           <GameArenaActive socket={socket} chatSocket={chatSocket} />
         )}
-        {eNotification && eNotification !== noNotification && <ENotification />}
+        {eNotification && eNotification.msg !== noNotification && (
+          <ENotification />
+        )}
       </div>
     </div>
   );

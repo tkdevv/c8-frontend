@@ -9,6 +9,8 @@ const ChatAndViews = ({ chatSocket }) => {
   const [messages, setMessages] = useContext(MessageContext);
   const [chatOpen, setChatOpen] = useState(chatOpenInit);
   const [newMessages, setNewMessages] = useState(messages.length);
+  const [textareaHeight, setTextareaHeight] = useState(20);
+  const textAreaRef = useRef();
 
   // socket.on("new message", (msg) => {
   //   console.log("IM UPDATING MESSAGES");
@@ -22,7 +24,7 @@ const ChatAndViews = ({ chatSocket }) => {
   };
 
   useEffect(() => {
-    // console.log("Messages Changed");
+    console.log(player);
 
     chatOpen && setNewMessages(messages.length);
   }, [messages]);
@@ -140,7 +142,13 @@ const ChatAndViews = ({ chatSocket }) => {
             <input
               ref={messageTyped}
               className="msg-input"
+              // style={{ height: `${textareaHeight}px` }}
               type="text"
+              // onInput={(e) => {
+              //   setTextareaHeight(e.)
+              //   // if(e.currentTarget.scrollHeight !== textareaHeight){
+              //   // }
+              // }}
               placeholder="say your chat"
             />
             <button type="submit" className="chat-submit">

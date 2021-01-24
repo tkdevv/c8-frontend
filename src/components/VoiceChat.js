@@ -9,20 +9,25 @@ const VoiceChat = ({ socket }) => {
   const [chatLoading, setChatLoading] = useState(true);
   const [initiated, setInitiated] = useState(false);
   const [peer, setPeer] = useState(null);
+  const [connectionErr, setConnectionErr] = useState(true);
 
-  // PEER
-  !peer &&
-    player &&
-    game.players.length > 0 &&
+  const connectPeer = () => {
     setPeer(
       new Peer(undefined, {
         host: "/",
         port: "9000",
       })
     );
+    if (peer) console.log(peer.disconnected);
+    if (peer) setConnectionErr(peer.disconnected);
+  };
+
+  // PEER
+  !peer && player && game.players.length > 0 && connectPeer();
 
   peer &&
     peer.on("open", (id) => {
+      setConnectionErr(false);
       const credentials = { gameId: game.id, playerId: player.id, vcid: id };
       socket.emit("vcid", credentials);
     });
@@ -79,14 +84,13 @@ const VoiceChat = ({ socket }) => {
     setTimeout(() => setChatLoading(false), 6500);
   }
 
-  // peer &&
-  //   peer.on("error", () => {
-  //     leaveVoiceChat();
-  //     console.log("Peer connection error.");
-  // console.log(peer.destroyed);
-  // console.log(peer.disconnected);
-  // setPeer(null);
-  // });
+  peer &&
+    !connectionErr &&
+    peer.on("error", () => {
+      console.log("Peer connection error.");
+      setConnectionErr(true);
+      leaveVoiceChat();
+    });
 
   const joinVoiceChat = () => {
     const constraints = {
@@ -175,19 +179,29 @@ const VoiceChat = ({ socket }) => {
       audRef[freeRef()[0]].current.srcObject = streamObject;
   };
 
+  // if (peer) console.log(peer.disconnected);
+
   return (
     <div
       style={chatLoading ? { display: "none" } : {}}
       className="voice-chat-container"
     >
-      {/* {peer && ( */}
-      <button
-        className={`vc-btn${playerInVoiceChat ? " vc-btn-on" : ""}`}
-        onClick={() => (playerInVoiceChat ? leaveVoiceChat() : joinVoiceChat())}
-      >
-        {playerInVoiceChat ? "VOICE OFF" : "VOICE ON"}
-      </button>
-      {/* )} */}
+      {(!peer || connectionErr) && (
+        <button className="vc-btn-offline" onClick={connectPeer}>
+          VOICE OFFLINE
+        </button>
+      )}
+
+      {peer && !connectionErr && (
+        <button
+          className={`vc-btn${playerInVoiceChat ? " vc-btn-on" : ""}`}
+          onClick={() =>
+            playerInVoiceChat ? leaveVoiceChat() : joinVoiceChat()
+          }
+        >
+          {playerInVoiceChat ? "VOICE OFF" : "VOICE ON"}
+        </button>
+      )}
 
       <div className="vc-indicators-container">
         {voiceChatroom.map((player) => (
@@ -196,7 +210,12 @@ const VoiceChat = ({ socket }) => {
       </div>
 
       {referenceNames.map((str) => (
-        <audio autoPlay key={str + "sfdc"} src="" ref={audRef[str]}></audio>
+        <audio
+          onLoadedMetadata={(e) => e.currentTarget.play()}
+          key={str + "sfdc"}
+          src=""
+          ref={audRef[str]}
+        ></audio>
       ))}
     </div>
   );
