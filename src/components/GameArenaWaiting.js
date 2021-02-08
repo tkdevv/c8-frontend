@@ -81,7 +81,7 @@ const GameArenaWaiting = ({ socket }) => {
       {/* <a
         href={`http://localhost:3000/${game.id}`}
       >{`http://localhost:3000/${game.id}`}</a> */}
-      <h3 className="share-link">{`https://tkdev.co.za/${game.id}`}</h3>
+      <h3 className="share-link">{`https://c8-front-end.herokuapp.com/${game.id}`}</h3>
 
       {player.isGameMaster && (
         <div className="num-cards-select-container">

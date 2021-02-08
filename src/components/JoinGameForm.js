@@ -49,7 +49,8 @@ const JoinGameForm = ({ socket, gameCode }) => {
 
   const joinGameHandler = ({ handle, justWatch }) => {
     if (!socket.connected) {
-      let msg = "Sorry. The server seems to be down try again later.";
+      let msg =
+        "Sorry, the server seems to be down try again in a few seconds.";
       eNotificationHandler({ msg });
       return;
     }
