@@ -4,26 +4,32 @@ import { AnimatePresence, motion } from "framer-motion";
 
 const ENotification = () => {
   const [eNotification] = useContext(eNotificationContext);
-  const backgroundColor = eNotification.colour
-    ? eNotification.colour
-    : "#11ff11";
+  const noNotification = "No Noti";
+  const notificationStyles = !eNotification.colour
+    ? { backgroundColor: "#fff", color: "#000" }
+    : eNotification.colour === "red"
+    ? { backgroundColor: "#bb0000", color: "#fff" }
+    : { backgroundColor: "#ff7171", color: "#fff" };
+
   return (
     <AnimatePresence exitBeforeEnter>
-      <motion.div
-        key={"noti"}
-        initial={{ y: -60 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.3 }}
-        style={{ background: backgroundColor }}
-        exit={{ y: -60 }}
-        className="e-modal-container"
-      >
-        <div className="e-modal">
-          <h1>{eNotification ? eNotification.msg : "Summer"}</h1>
-          {/* <button>X</button> */}
-          {/* <button onClick={eNotificationHandler("No Noti")}>X</button> */}
-        </div>
-      </motion.div>
+      {eNotification && eNotification.msg !== noNotification && (
+        <motion.div
+          key={"noti"}
+          initial={{ y: -60 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.3 }}
+          style={notificationStyles}
+          exit={{ y: -60 }}
+          className="e-modal-container"
+        >
+          <div className="e-modal">
+            <h1 style={{ color: notificationStyles.color }}>
+              {eNotification.msg}
+            </h1>
+          </div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };

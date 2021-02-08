@@ -163,7 +163,7 @@
           justify-content: flex-end;
   top: 80px;
   position: relative;
-  height: 80vh;
+  height: 65vh;
   max-height: 600px;
   position: fixed;
   -ms-flex-item-align: end;
@@ -182,9 +182,8 @@
 @media (max-width: 1050px) {
   .game-arena-container .chat-container {
     background: #677ce7;
-    background: -webkit-gradient(linear, left top, left bottom, from(#051937ec), color-stop(#004d7aec), to(#008793ec));
-    background: linear-gradient(180deg, #051937ec, #004d7aec, #008793ec);
-    background-color: #fff;
+    background: -webkit-gradient(linear, left top, left bottom, from(#48b479), color-stop(#246c45), to(#1a493e));
+    background: linear-gradient(180deg, #48b479, #246c45, #1a493e);
     border: 1px solid #ff9292;
     position: fixed;
     top: auto;
@@ -196,15 +195,9 @@
   }
 }
 
-@media (max-width: 1050px) and (min-height: 750px) and (max-width: 1050px) {
-  .game-arena-container .chat-container {
-    max-height: 80vh;
-  }
-}
-
 .game-arena-container .chat-container .chat-toggle-container {
   position: absolute;
-  top: -40px;
+  top: -30px;
 }
 
 @media (min-width: 1050px) {
@@ -216,7 +209,7 @@
 .game-arena-container .chat-container .chat-toggle-container .unread-messages-container {
   position: absolute;
   top: -15px;
-  right: -0px;
+  left: -0px;
   width: 20px;
   height: 23px;
   font-weight: 900;
@@ -235,15 +228,16 @@
           align-items: center;
 }
 
-.game-arena-container .chat-container .chat-toggle-container button {
+.game-arena-container .chat-container .chat-toggle-container .toggle-full-chat-btn {
   font-size: 14px;
   border-radius: 500px;
-  font-weight: 900;
-  padding: 5px 10px;
+  font-weight: 600;
+  padding: 3px 5px;
   color: #ff9292;
-  color: #5faef8;
-  background-color: #020202;
+  color: #030405;
+  background-color: #11ecfc;
   border: none;
+  border: 1px solid rgba(0, 0, 0, 0.301);
 }
 
 .game-arena-container .chat-container .chat-form-container .chat-form {
@@ -258,6 +252,7 @@
   height: 30px;
   border: none;
   border-radius: 15px;
+  padding: 0 10px;
   color: #ebebeb;
   bottom: 0;
   display: -webkit-box;
@@ -329,7 +324,7 @@
           flex-direction: column-reverse;
   -ms-flex-negative: inherit;
       flex-shrink: inherit;
-  word-break: break-all;
+  word-break: normal;
   overflow-x: hidden;
   overflow-y: scroll;
   -ms-overflow-style: none;
@@ -378,6 +373,39 @@
   font-weight: 100;
   padding: 0;
   margin: 0;
+}
+
+.game-arena-container .live-chat-open {
+  background: rgba(237, 237, 238, 0.301);
+  background: -webkit-gradient(linear, left top, left bottom, from(#0519372d), color-stop(#004d7a38), to(#00879352));
+  background: linear-gradient(#0519372d, #004d7a38, #00879352);
+  padding-top: 5px;
+  border: none;
+  height: initial;
+  max-height: 30vh;
+}
+
+.game-arena-container .live-chat-open .msg-output-container {
+  width: initial;
+  max-width: 60vw;
+}
+
+.game-arena-container .live-chat-open .msg-output-container .live-chat-msg-container {
+  pointer-events: initial;
+  margin: 2px;
+  background-color: #003557;
+  color: #000;
+  pointer-events: all;
+}
+
+.game-arena-container .live-chat-open .msg-output-container .live-chat-msg-container .msg-msg {
+  text-shadow: 0px 0px 5px #00000086;
+}
+
+.game-arena-container .live-chat-open .chat-online-players-container {
+  text-shadow: 0px 0px 1px #000000;
+  color: #000;
+  padding: 3px;
 }
 
 .game-arena-container .chat-online-players-container {
@@ -514,16 +542,15 @@
 
 .game-container .game-wrapper .quit-button {
   width: 100px;
-  margin: 0 auto;
-  margin-top: 20px;
-  border-radius: 4px;
+  margin: 20px auto;
+  border-radius: 5px;
   -ms-grid-column-align: center;
       justify-self: center;
   font-size: 16px;
-  padding: 10px;
+  padding: 5px 10px;
   color: #ff9292;
   color: #000;
-  background-color: rgba(57, 73, 165, 0.486);
+  background-color: #8c39a5;
   border: 1px solid #ff9292;
   border: none;
 }
@@ -916,8 +943,8 @@ body {
   background-repeat: no-repeat;
   background-color: #0e0e11;
   background: #677ce7;
-  background: -webkit-gradient(linear, left bottom, left top, from(#051937), color-stop(#004d7a), to(#008793));
-  background: linear-gradient(0deg, #051937, #004d7a, #008793);
+  background: -webkit-gradient(linear, left top, left bottom, from(#48b479), color-stop(#246c45), to(#1a493e));
+  background: linear-gradient(180deg, #48b479, #246c45, #1a493e);
   background-size: 100% 140%;
   font-family: Helvetica, sans-serif, sans-serif;
   font-weight: 00;

@@ -2,10 +2,14 @@ import React, { useRef, useState, useContext } from "react";
 import StartGameForm from "../StartGameForm";
 import JoinGameForm from "../JoinGameForm";
 import { Redirect } from "react-router-dom";
-import { GameAndPlayerContext } from "../context/GameContext";
+import {
+  eNotificationContext,
+  GameAndPlayerContext,
+} from "../context/GameContext";
 import { useForm } from "react-hook-form";
 import { v4 as uuid } from "uuid";
 import { getGameId, titleCase, removeStrSpaces } from "../utils/utils";
+import ENotification from "../ENotification";
 
 const HomePage = ({ socket }) => {
   //React Hook Form
@@ -14,21 +18,29 @@ const HomePage = ({ socket }) => {
   const gameCode = getGameId(window.location.pathname);
 
   // Context
-  const [{ game, player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
+  const [{ game, player }, setGameAndPlayer, handleSettingStates] = useContext(
+    GameAndPlayerContext
+  );
+  const [eNotification, eNotificationHandler] = useContext(
+    eNotificationContext
+  );
 
   !player.id && socket.emit("get id");
 
   socket.on("your id", (my_id) => {
-    console.log("Getting Id");
-    !player.id &&
-      setGameAndPlayer((prev) => {
-        prev.player.id = my_id;
-        return prev;
-      });
+    setGameAndPlayer((prev) => {
+      prev.player.id = my_id;
+      return prev;
+    });
   });
 
   // Form Submission
   const startGameHandler = (data) => {
+    if (!socket.connected) {
+      let msg = "Sorry. The server seems to be down. Try again later.";
+      eNotificationHandler({ msg, colour: "red" });
+      return;
+    }
     if (data.gameCode) {
       return;
     }
@@ -47,13 +59,7 @@ const HomePage = ({ socket }) => {
       prev.player.handle = titleCase(handle);
       prev.player.isGameMaster = true;
       prev.player.status = justWatch ? "watching" : "waiting";
-      return prev;
-    });
 
-    console.log(player.id);
-
-    // Set Game
-    setGameAndPlayer((prev) => {
       // Generate Game ID
       prev.game.id = `${removeStrSpaces(
         player.handle
@@ -66,6 +72,15 @@ const HomePage = ({ socket }) => {
       // prevGame.rules.isTournament = isTournament;
       // prevGame.rules.antiCheat = true;
       prev.game.rules.jokerTally = jokerTally;
+
+      handleSettingStates(
+        {
+          gameId: prev.game.id,
+          playerId: prev.player.id,
+          playerHandle: prev.player.handle,
+        },
+        true
+      );
       return prev;
     });
 
@@ -92,6 +107,7 @@ const HomePage = ({ socket }) => {
           </div>
         )}
       </div>
+      <ENotification />
     </div>
   );
 };

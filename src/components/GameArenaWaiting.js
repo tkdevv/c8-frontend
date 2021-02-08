@@ -78,10 +78,10 @@ const GameArenaWaiting = ({ socket }) => {
       <h1 className="game-waiting-heading">
         Share game link below to invite players.
       </h1>
-      <a
+      {/* <a
         href={`http://localhost:3000/${game.id}`}
-      >{`http://localhost:3000/${game.id}`}</a>
-      {/* <h3 className="share-link">{`https://tkdev.co.za/${game.id}`}</h3> */}
+      >{`http://localhost:3000/${game.id}`}</a> */}
+      <h3 className="share-link">{`https://tkdev.co.za/${game.id}`}</h3>
 
       {player.isGameMaster && (
         <div className="num-cards-select-container">

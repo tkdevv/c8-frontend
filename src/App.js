@@ -4,31 +4,23 @@ import io from "socket.io-client";
 import Nav from "./components/Nav";
 import {
   eNotificationContext,
-  MessageContext,
   GameAndPlayerContext,
+  GameDetailsContext,
 } from "./components/context/GameContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import GameArena from "./components/pages/GameArena";
-import { removeDuplicates } from "./components/utils/utils";
 
 const App = () => {
-  const [chatRegistered, setChatRegistered] = useState(false);
-
   // | CONTEXT VARIABLES
-  const [messages, setMessages] = useContext(MessageContext);
-  const [{ player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
+  const [gameAndPlayer, setGameAndPlayer, handleSettingStates] = useContext(
+    GameAndPlayerContext
+  );
+  const { playerId } = useContext(GameDetailsContext);
   const [eNotification, eNotificationHandler] = useContext(
     eNotificationContext
   );
-
-  // const socket = io("https://crazy-8.herokuapp.com/");
-  // const chatSocket = io("https://crazy-8.herokuapp.com/chat");
-  const socket = io("http://localhost:8001/");
-  const chatSocket = io("http://localhost:8001/chat");
-
-  const handleChatRegister = (gameId, handle) => {
-    chatSocket.emit("join chat", { gameId, chatRegistered, handle });
-  };
+  const socket = io("https://crazy-8.herokuapp.com/");
+  // const socket = io("http://localhost:8001/");
 
   // | SOCKET EVENTS
   socket.on("game error", () => window.location.reload());
@@ -40,15 +32,20 @@ const App = () => {
 
   socket.on("checked notification", (playerObj) => {
     const msg = `${
-      playerObj.id === player.id ? "You" : playerObj.handle
+      playerObj.id === playerId ? "You" : playerObj.handle
     } just checked. Congrats`;
-    eNotificationHandler({ msg, colour: "#11ff11" });
+    eNotificationHandler({ msg, colour: "green" });
   });
   socket.on("game update", (gameObject) => {
-    const playerObj = gameObject.players.filter(
-      (playerObject) => playerObject.id === player.id
-    )[0];
-    setGameAndPlayer({ game: gameObject, player: playerObj });
+    handleSettingStates(gameObject);
+  });
+
+  // Player Quit Notification
+  socket.on("quit notification", (playerObj) => {
+    const msg = `${
+      playerObj.id === playerId ? "You" : playerObj.handle
+    } just quit the game.`;
+    eNotificationHandler({ msg, colour: "red" });
   });
 
   // const handleErrors = (code) => {
@@ -62,18 +59,6 @@ const App = () => {
   // chatSocket.on("connect_failed", () => handleErrors("chat c2"));
   // chatSocket.on("disconnect", () => handleErrors("chat c3"));
 
-  // | Chat Socket Events
-  chatSocket.on("new message", (msg) => {
-    setMessages((prevMsgs) => {
-      const unSortedMessages = [msg, ...prevMsgs];
-      return removeDuplicates(unSortedMessages, player);
-    });
-  });
-
-  chatSocket.on("chat joined", () => {
-    setChatRegistered(true);
-  });
-
   return (
     <div>
       {/* <GlobalState socket={socket}> */}
@@ -84,16 +69,7 @@ const App = () => {
           <Route
             exact
             path="/arena"
-            render={(props) => (
-              <GameArena
-                {...props}
-                socket={socket}
-                chatSocket={chatSocket}
-                handleChatRegister={handleChatRegister}
-                chatRegistered={chatRegistered}
-                setChatRegistered={setChatRegistered}
-              />
-            )}
+            render={(props) => <GameArena socket={socket} />}
           />
           <Route
             exact

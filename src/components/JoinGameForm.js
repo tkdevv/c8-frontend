@@ -1,5 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
-import { GameAndPlayerContext } from "./context/GameContext";
+import {
+  eNotificationContext,
+  GameAndPlayerContext,
+} from "./context/GameContext";
 import { Redirect } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { titleCase } from "./utils/utils";
@@ -7,6 +10,9 @@ import { titleCase } from "./utils/utils";
 const JoinGameForm = ({ socket, gameCode }) => {
   const { register, handleSubmit, errors } = useForm();
   const [{ player }, setGameAndPlayer] = useContext(GameAndPlayerContext);
+  const [eNotification, eNotificationHandler] = useContext(
+    eNotificationContext
+  );
   const [gameCodeError, setGameCodeError] = useState(false);
 
   const [redirect, setRedirect] = useState(false);
@@ -20,14 +26,13 @@ const JoinGameForm = ({ socket, gameCode }) => {
   }, []);
 
   socket.on("game 404", () => {
-    console.log("4000004");
     setGameCodeError(() => true);
     setRedirect(() => true);
   });
 
-  socket.on("join game error", (msg) => {
-    console.log("Caution. Rouge Robots");
-  });
+  // socket.on("join game error", (msg) => {
+
+  // });
 
   // socket.on("game update", (gameObj) => {
   //   setGame(() => gameObj.game);
@@ -43,6 +48,12 @@ const JoinGameForm = ({ socket, gameCode }) => {
   // });
 
   const joinGameHandler = ({ handle, justWatch }) => {
+    if (!socket.connected) {
+      let msg = "Sorry. The server seems to be down try again later.";
+      eNotificationHandler({ msg });
+      return;
+    }
+
     setGameCodeError(() => false);
     setGameAndPlayer((prev) => {
       prev.player.handle = titleCase(handle);

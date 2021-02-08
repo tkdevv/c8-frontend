@@ -22,7 +22,8 @@ const GameArenaActive = ({ socket }) => {
   );
   const [eightEvent, setEightEvent] = useState(null);
   const playersPlaying = game.players.filter(
-    (player) => player.status === "waiting" || player.status === "active"
+    (playerObj) =>
+      playerObj.status === "waiting" || playerObj.status === "active"
   );
 
   // GAME LOGIC
@@ -64,7 +65,8 @@ const GameArenaActive = ({ socket }) => {
     let currentPlayerId = game.order[0].id;
 
     if (game.order[0].status !== "active") {
-      return game.order.filter((player) => player.status === "active")[0].id;
+      return game.order.filter((playerObj) => playerObj.status === "active")[0]
+        .id;
     }
     return currentPlayerId;
   };

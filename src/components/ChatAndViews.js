@@ -1,52 +1,70 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { GameAndPlayerContext, MessageContext } from "./context/GameContext";
+import { GameDetailsContext } from "./context/GameContext";
+import useForceUpdate from "./hooks/useForceUpdate";
+import { removeDuplicates } from "./utils/utils";
 
 const ChatAndViews = ({ chatSocket }) => {
   const mobileChatWidth = 1050;
   const chatOpenInit = window.innerWidth >= mobileChatWidth ? true : false;
-  const messageTyped = useRef();
-  const [{ player, game }] = useContext(GameAndPlayerContext);
-  const [messages, setMessages] = useContext(MessageContext);
+  const messageTyped = useRef([]);
+  const {
+    playerId,
+    gameId,
+    playerHandle,
+    playerColour,
+    gamePlayers,
+    playersVCAvail,
+  } = useContext(GameDetailsContext);
+  const forceUpdate = useForceUpdate();
+  const messages = useRef([]);
   const [chatOpen, setChatOpen] = useState(chatOpenInit);
-  const [newMessages, setNewMessages] = useState(messages.length);
+  const [newMessages, setNewMessages] = useState(messages.current.length);
+  const [liveChatMode, setLiveChatMode] = useState(false);
   const [textareaHeight, setTextareaHeight] = useState(20);
   const textAreaRef = useRef();
 
-  // socket.on("new message", (msg) => {
-  //   console.log("IM UPDATING MESSAGES");
-  //   setMessages((prevMsgs) => [msg, ...prevMsgs]);
-  // });
-
   const toggleButtonText = chatOpen ? "Close Chat" : "Open Chat";
-  const chatOpenClass = !chatOpen ? " toggle-closed" : "";
+  const chatOpenClass = liveChatMode
+    ? " live-chat-open"
+    : !chatOpen
+    ? " toggle-closed"
+    : "";
   const handleStyle = (colour) => {
     return { color: colour ? colour : "#fd7362" };
   };
 
-  useEffect(() => {
-    console.log(player);
+  chatSocket.on("new message", (msg) => {
+    const handle = msg.handle;
+    const messagesAlreadySent = messages.current.map((msg_) => msg_.id);
+    if (!messagesAlreadySent.includes(msg.id)) {
+      const unSortedMessages = [msg, ...messages.current];
+      messages.current = removeDuplicates(unSortedMessages, { handle });
+      (chatOpen || liveChatMode) && setNewMessages(messages.current.length);
+      !chatOpen && forceUpdate();
+    }
+  });
 
-    chatOpen && setNewMessages(messages.length);
-  }, [messages]);
+  // useEffect(() => {
+  //   console.log("Messages changed.");
+  // }, [messages.current]);
 
   useEffect(() => {
-    window.addEventListener(
-      "resize",
-      () => window.innerWidth >= mobileChatWidth && setChatOpen(true)
-    );
+    window.addEventListener("resize", () => {
+      window.innerWidth >= mobileChatWidth && setChatOpen(true);
+      window.innerWidth >= mobileChatWidth && setLiveChatMode(false);
+    });
   }, []);
 
   const handleMsgSubmit = (e) => {
     e.preventDefault();
-    const gameId = game.id;
-    const playerId = player.id;
-    const message = messageTyped.current.value;
-    if (message) {
+    const msg = messageTyped.current.value;
+
+    if (msg) {
       chatSocket.emit("message", {
         gameId,
         playerId,
-        message,
-        colour: player.colour,
+        message: msg,
+        colour: playerColour,
       });
       messageTyped.current.value = "";
     }
@@ -62,9 +80,8 @@ const ChatAndViews = ({ chatSocket }) => {
     let sortedMessages = [];
     let prevMessage = { handle: "" };
 
-    messages.forEach((message) => {
-      message.handle =
-        message.handle === player.handle ? "you" : message.handle;
+    messages.current.forEach((message) => {
+      message.handle = message.handle === playerHandle ? "you" : message.handle;
       if (
         (message.action === "connected" || message.action === "disconnected") &&
         prevMessage.action === message.action
@@ -86,30 +103,64 @@ const ChatAndViews = ({ chatSocket }) => {
   };
 
   const handleChatToggle = () => {
-    setNewMessages(messages.length);
+    messages.current.length !== newMessages &&
+      setNewMessages(messages.current.length);
     setChatOpen((prev) => !prev);
   };
 
   const indicatorStyles = (vcAvail) =>
-    vcAvail ? { backgroundColor: "#ff00ff" } : { backgroundColor: "#11ff11" };
+    vcAvail ? { backgroundColor: "#ff7c11" } : { backgroundColor: "#11ff11" };
+
+  const handleLiveChat = () => {
+    setLiveChatMode((prev) => !prev);
+    messages.current.length !== newMessages &&
+      setNewMessages(messages.current.length);
+  };
 
   return (
     <div>
       <div className={`chat-container${chatOpenClass}`}>
         <div className="chat-toggle-container">
-          <button onClick={() => handleChatToggle()}>{toggleButtonText}</button>
-          {messages.length - newMessages > 0 && (
-            <div className="unread-messages-container">
-              {messages.length - newMessages}
-            </div>
+          {!liveChatMode && (
+            <button
+              className="toggle-full-chat-btn"
+              onClick={() => handleChatToggle()}
+            >
+              {toggleButtonText}
+            </button>
           )}
+          {!chatOpen && (
+            <button
+              className="toggle-full-chat-btn"
+              onClick={() => handleLiveChat()}
+              style={{ marginLeft: !chatOpen && !liveChatMode ? "10px" : "" }}
+            >
+              {liveChatMode ? "Close Small Chat" : "Open Small Chat"}
+            </button>
+          )}
+          {messages.current.length - newMessages > 0 &&
+            !liveChatMode &&
+            !chatOpen && (
+              <div className="unread-messages-container">
+                {messages.current.length - newMessages}
+              </div>
+            )}
         </div>
-        <div className="msg-output-container">
-          {messages
+        <div
+          style={!liveChatMode && !chatOpen ? { display: "none" } : {}}
+          className="msg-output-container"
+        >
+          {messages.current
             .sort((a, b) => b.timestamp - a.timestamp)
             .map((msg, index) =>
               !msg.action ? (
-                <div key={index} className="user-msg-container">
+                <div
+                  key={index}
+                  className={
+                    "user-msg-container" +
+                    (liveChatMode ? " live-chat-msg-container" : "")
+                  }
+                >
                   <h4 style={handleStyle(msg.colour)} className="msg-handle">
                     {msg.handle}
                   </h4>
@@ -126,13 +177,18 @@ const ChatAndViews = ({ chatSocket }) => {
         </div>
 
         <div className="chat-online-players-container">
-          {game.players.map((player) => (
-            <div key={player.id + "chatdhsgks"} className="chat-online-players">
+          {gamePlayers.map((playerObj) => (
+            <div
+              key={playerObj.id + "chatdhsgks"}
+              className="chat-online-players"
+            >
               <div
-                style={indicatorStyles(player.voiceChatAvail)}
+                style={indicatorStyles(
+                  playersVCAvail.map((obj) => obj.id).includes(playerObj.id)
+                )}
                 className="indicator-circle"
               ></div>
-              <h3 className="online-player-handle">{player.handle}</h3>
+              <h3 className="online-player-handle">{playerObj.handle}</h3>
             </div>
           ))}
         </div>

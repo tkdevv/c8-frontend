@@ -3,49 +3,34 @@ import ChatAndViews from "../ChatAndViews";
 import GameArenaWaiting from "../GameArenaWaiting";
 import GameArenaActive from "../GameArenaActive";
 import {
-  GameAndPlayerContext,
+  GameDetailsContext,
   eNotificationContext,
+  GameAndPlayerContext,
 } from "../context/GameContext";
 import { Redirect } from "react-router-dom";
 import ENotification from "../ENotification";
 import VoiceChat from "../VoiceChat";
+import TextChatWrapper from "../TextChatWrapper";
 
-const GameArena = ({
-  socket,
-  chatSocket,
-  handleChatRegister,
-  // peer,
-  // setPeer,
-  chatRegistered,
-}) => {
+const GameArena = ({ socket }) => {
   // const [chatRegistered, setChatRegistered] = useState(false);
 
-  const [{ game, player }] = useContext(GameAndPlayerContext);
-  const noNotification = "No Noti";
+  const [{ game }] = useContext(GameAndPlayerContext);
+  const { gameId, gameState, playerColour } = useContext(GameDetailsContext);
   const [eNotification] = useContext(eNotificationContext);
-
-  useEffect(() => {
-    !chatRegistered &&
-      player.colour &&
-      handleChatRegister(game.id, player.handle);
-  }, [player]);
-
-  console.log(eNotification);
 
   return (
     <div className="game-arena-container">
       {!game.id && <Redirect to="" />}
-      <ChatAndViews chatSocket={chatSocket} />
+      <TextChatWrapper />
       <VoiceChat socket={socket} />
       <div className="game-area">
-        {game.state === "waiting" || game.state === "waitingNewRound" ? (
+        {gameState === "waiting" || gameState === "waitingNewRound" ? (
           <GameArenaWaiting socket={socket} />
         ) : (
-          <GameArenaActive socket={socket} chatSocket={chatSocket} />
+          <GameArenaActive socket={socket} />
         )}
-        {eNotification && eNotification.msg !== noNotification && (
-          <ENotification />
-        )}
+        <ENotification />
       </div>
     </div>
   );

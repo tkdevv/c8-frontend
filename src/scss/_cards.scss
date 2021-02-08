@@ -37,15 +37,15 @@
 
     .quit-button {
       width: 100px;
-      margin: 0 auto;
-      margin-top: 20px;
-      border-radius: 4px;
+      margin: 20px auto;
+      // margin-top: 20px;
+      border-radius: 5px;
       justify-self: center;
       font-size: 16px;
-      padding: 10px;
+      padding: 5px 10px;
       color: $pink-trim-color;
       color: #000;
-      background-color: rgba(57, 73, 165, 0.486);
+      background-color: rgb(140, 57, 165);
       border: 1px solid $pink-trim-color;
       border: none;
 
@@ -194,11 +194,16 @@
       grid-template-columns: repeat(auto-fill, mixmax(50px, 1fr));
       grid-template-columns: repeat(3, 100px);
       justify-content: center;
-      // align-items: center;
-      // flex-wrap: wrap;
-      // background-color: paleturquoise;
-      // width: 90%;
       margin: 15px auto;
+      // max-height: 200px;
+      // background-color: plum;
+      // overflow-y: scroll;
+      // -ms-overflow-style: none; /* IE and Edge */
+      // scrollbar-width: none; /* Firefox */
+
+      // &::-webkit-scrollbar {
+      //   display: none;
+      // }
 
       @media (max-width: 600px) {
         padding-top: 0px;

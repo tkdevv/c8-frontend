@@ -12,13 +12,13 @@ const VoiceChat = ({ socket }) => {
   const [connectionErr, setConnectionErr] = useState(true);
 
   const connectPeer = () => {
-    setPeer(
-      new Peer(undefined, {
-        host: "/",
-        port: "9000",
-      })
-    );
-    if (peer) console.log(peer.disconnected);
+    setPeer(new Peer());
+    // setPeer(
+    //   new Peer(undefined, {
+    //     host: "/",
+    //     port: "9000",
+    //   })
+    // );
     if (peer) setConnectionErr(peer.disconnected);
   };
 
@@ -111,9 +111,7 @@ const VoiceChat = ({ socket }) => {
           setCallObject(call);
           call.answer(streamObj);
 
-          call.on("close", () => {
-            console.log("call closed");
-          });
+          call.on("close", () => {});
 
           call.on("stream", (userStream) => {
             // console.log("calling stream: ", userStream);
@@ -129,15 +127,12 @@ const VoiceChat = ({ socket }) => {
   // console.log("Chatty: ", player.voiceChatAvail);
 
   const sendPlayersMyAudio = (streamObj) => {
-    console.log("HAPPENINGS");
     voiceChatroom.forEach((playerObj) => {
       // console.log(playerObj.voiceChatId, player.id);
       if (playerObj.id !== player.id) {
-        console.log("xxx: ", playerObj.handle);
         const call = peer.call(playerObj.voiceChatId, streamObj);
         if (!callObject) setCallObject(call);
         call.on("stream", (theirStream) => {
-          console.log("their stream");
           addStreamToDOM(theirStream);
         });
 
